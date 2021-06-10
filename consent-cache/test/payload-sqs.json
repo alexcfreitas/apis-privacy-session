@@ -1,0 +1,20 @@
+{
+	"Records": [
+		{
+			"messageId": "dd6f5c17-be3b-44da-8457-2e497d1c681e",
+			"receiptHandle": "AQEBOSUZTUUkciLJT7oK1gUlcdkj7xZASp/kJPF/IhK4C0w9Y4VG8/Zq54Dteg2//8RQICFLBZF1UanTxK9j9Y9V7bYfqDLs7N5hsT83AfT601Mai7CNRXHPuPuqpksjznvWtSlwm3GX6WoJli8u00v+FaBA0UMgROI+z8emO7YLnV2HokkxHmy1LXZw+sS/A9Y6hXDDk5H2MWFfdo+VJBxmv1oCJZdHL+GbPw0kHOooN8MxyLDj6ucgPuJq96hHzPsQlif2cjChu6DXaEINTZyJMuiRPZifG96cDLipn967dCaVZFfogV4xPey18M1im8KJtvZ7ZOJPRkwS/+0WW539mE8zFx+D2/lJfkSzmMPZF4dVIReNAF9lxMLi2HVBCIKXjXKC0b01AdcAz/IEzJTmSRR0WvW6e4l4mq7yKNvXT50=",
+			"body": "{\"key\":\"76fabe7ffe404e799abdf12b466150f9\",\"consents\":[{\"spvll\":\"579e6ea1677718f662a1325c4bff799b6fc17e13440194c1efbcb6be25cdc092.05b736d63f861180b16e5086de3122747ace9e526814e5de3acd1b26e060102c.4607\",\"organizationId\":\"312\",\"identifier\":{\"key\":\"carteirinha\",\"value\":\"rodrigo.gomes\"},\"consent\":{\"typeId\":2,\"isAccepted\":true,\"consentAt\":\"2020-10-24 18:16:57\"}}]}",
+			"attributes": {
+				"ApproximateReceiveCount": "6",
+				"SentTimestamp": "1603574218101",
+				"SenderId": "AROA3HPWWSDGLOVBIII6K:consent-management-prod-putRootBySession",
+				"ApproximateFirstReceiveTimestamp": "1603574218101"
+			},
+			"messageAttributes": {},
+			"md5OfBody": "d8d1b753d03c7d333beb7ca28f1fe803",
+			"eventSource": "aws:sqs",
+			"eventSourceARN": "arn:aws:sqs:sa-east-1:772000878796:sqs-consent-management-cache-prod",
+			"awsRegion": "sa-east-1"
+		}
+	]
+}

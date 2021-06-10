@@ -1,0 +1,331 @@
+service: privacy-consent-management
+
+provider:
+  name: aws
+  endpointType: REGIONAL
+  runtime: nodejs12.x
+  profile: privally
+  region: sa-east-1
+  timeout: 10
+  stage: ${opt:stage, 'prod'}
+  memorySize: 128
+  versionFunctions: false
+  package:
+    excludeDevDependencies: true
+    exclude:
+      - .git/**
+      - .vscode/**
+      - .test/**
+
+  environment: #Global Environment variables
+    ${file(./configs/${self:provider.stage}.yml)}
+
+  iamRoleStatements: # Permissions for all of your functions can be set here
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 'arn:aws:dynamodb:*:*:*'
+
+custom:
+  region: ${self:provider.region}
+  stage: ${opt:stage, self:provider.stage}
+  prefix: ${self:service}-${self:custom.stage}
+  sqs-consent-management: sqs-consent-management-cache-${self:custom.stage}
+  dynamo-consent-management: table-consent-management-${self:custom.stage}
+  sns-logs: ${self:custom.prefix}-trigger-logs
+  sqs-logs: ${self:custom.prefix}-messages-logs
+  stageTargets:
+    local:
+      domain: dev-sandbox.api.privally.ws
+      certificate: 'arn:aws:acm:sa-east-1:772000878796:certificate/0dfc4a90-633b-485c-a54c-41b16889b283'
+    dev:
+      domain: dev-sandbox.api.privally.ws
+      certificate: 'arn:aws:acm:sa-east-1:772000878796:certificate/0dfc4a90-633b-485c-a54c-41b16889b283'
+    sandbox:
+      domain: sandbox.api.privally.ws
+      certificate: 'arn:aws:acm:sa-east-1:772000878796:certificate/0dfc4a90-633b-485c-a54c-41b16889b283'
+    prod:
+      domain: api.privally.ws
+      certificate: 'arn:aws:acm:sa-east-1:772000878796:certificate/b3aacd15-7859-4022-9e6b-65c967eb9c03'
+  target: ${self:custom.stageTargets.${self:custom.stage}}
+
+  authorizer:
+    default:
+      name: authorizerAsset
+      type: token
+      identitySource: method.request.header.x-api-key
+      resultTtlInSeconds: 0
+
+  documentation:
+    api:
+      info:
+        version: v0.0.1
+        title: Privally Session Information
+        description: API for Get Information of Session
+    models:
+      - name: sessionStartRequest
+        contentType: application/json
+        schema:
+          type: 'object'
+          properties:
+            spvll:
+              type: 'string'
+            identifier:
+              type: 'object'
+              properties:
+                key:
+                  type: 'string'
+                value:
+                  type: 'string'
+
+  customDomain:
+    domainName: ${self:custom.target.domain}
+    stage: ${self:provider.stage}
+    basePath: organization
+    certificateArn: ${self:custom.target.certificate}
+    createRoute53Record: true
+    endpointType: 'regional'
+    securityPolicy: tls_1_2
+    apiType: rest
+    autoDomain: false
+
+  serverless-offline:
+    host: '0.0.0.0'
+
+  splitStacks:
+    perFunction: true
+    perType: true
+
+  # serverless-offline-sqs-esmq:
+  #   apiVersion: '2012-11-05'
+  #   endpoint: http://localhost:9324
+  #   region: sa-east-1
+  #   accessKeyId: root
+  #   secretAccessKey: root
+
+  # dynamodb:
+  #   stages:
+  #     - local
+  #   start:
+  #     host: 'localhost'
+  #     port: 8005
+  #     inMemory: false
+  #     migrate: true
+  #     noStart: true
+
+plugins:
+  - serverless-offline-local-authorizers-plugin
+  - serverless-offline
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
+  - serverless-domain-manager
+  - serverless-pseudo-parameters
+  - serverless-dynamodb-local
+  - serverless-offline-sqs-esmq
+  - serverless-offline-schedule
+
+functions:
+  authorizerAsset:
+    handler: endpoints/authorizer.authorizer
+
+  # consentConsumer:
+  #   handler: ./consent-cache/test/consumerBatch.run
+  #   memorySize: 128
+  #   timeout: 60
+  #   events:
+  # #     # - sqs: arn:aws:sqs:${self:custom.region}:772000878796:${self:custom.sqs-consent-management}
+  #     - schedule: 
+  #         rate: rate(1 minute) # Rate Syntax
+  #         # rate: cron(* * ? * * *) # Cron Syntax
+  #         # enabled: true # Trigger Enabled
+
+  getBySession:
+    handler: ./consent-api/endpoints/getBySession.run
+    memorySize: 128
+    timeout: 30
+    events:
+      - http:
+          path: consent/enable
+          method: post
+          authorizer:
+            type: CUSTOM
+            authorizerId: abcjfk
+            localAuthorizer:
+              name: 'authorizer'
+              type: 'request'
+          cors: true
+          # authorizer: ${self:custom.authorizer.default}
+          documentation:
+            summary: Send Information Session to Privally
+            description: This endpoint receive session token with identifier field
+            requestBody:
+              description: Request body for session
+            requestModels:
+              application/json: 'sessionStartRequest'
+          reqValidatorName: onlyBody
+
+  putBySession:
+    handler: ./consent-api/endpoints/putBySession.run
+    memorySize: 128
+    timeout: 30
+    events:
+      - http:
+          path: consent/enable
+          method: put
+          authorizer:
+            type: CUSTOM
+            authorizerId: abcjfk
+            localAuthorizer:
+              name: 'authorizer'
+              type: 'request'
+          cors: true
+          # authorizer: ${self:custom.authorizer.default}
+          documentation:
+            summary: Send Information Session to Privally
+            description: This endpoint receive session token with identifier field
+            requestBody:
+              description: Request body for session
+            requestModels:
+              application/json: 'sessionStartRequest'
+          reqValidatorName: onlyBody
+
+  start:
+    handler: ./session-api/endpoints/start.run
+    memorySize: 128
+    timeout: 30
+    events:
+      - http:
+          path: session/start
+          method: post
+          authorizer:
+            type: CUSTOM
+            authorizerId: abcjfk
+            localAuthorizer:
+              name: 'authorizer'
+              type: 'request'
+
+          cors: true
+          # authorizer: ${self:custom.authorizer.default}
+          documentation:
+            summary: Send Information Session to Privally
+            description: This endpoint receive session token with identifier field
+            requestBody:
+              description: Request body for session
+            requestModels:
+              application/json: 'sessionStartRequest'
+          reqValidatorName: onlyBody
+
+  end:
+    handler: ./session-api/endpoints/end.run
+    memorySize: 128
+    timeout: 30
+    events:
+      - http:
+          path: session/end
+          method: post
+          authorizer:
+            type: CUSTOM
+            authorizerId: abcjfk
+            localAuthorizer:
+              name: 'authorizer'
+              type: 'request'
+          cors: true
+          # authorizer: ${self:custom.authorizer.default}
+          documentation:
+            summary: Send Information Session to Privally
+            description: This endpoint receive session token with identifier field
+            requestBody:
+              description: Request body for session
+            requestModels:
+              application/json: 'sessionStartRequest'
+          reqValidatorName: onlyBody
+
+  enable:
+    handler: ./organization-api/endpoints/enable.run
+    memorySize: 128
+    timeout: 30
+    events:
+      - http:
+          path: organization/enable
+          method: post
+          cors: true
+          # authorizer: ${self:custom.authorizer.default}
+          documentation:
+            summary: Create a new Organization to Privally
+            description: This endpoint save a  list of organizations, identifiers and assets
+            requestBody:
+              description: Request body for create a new Organization
+
+  update:
+    handler: ./organization-api/endpoints/update.run
+    memorySize: 128
+    timeout: 30
+    events:
+      - http:
+          path: organization/enable
+          method: put
+          cors: true
+          # authorizer: ${self:custom.authorizer.default}
+          documentation:
+            summary: Create a new Organization to Privally
+            description: This endpoint save a  list of organizations, identifiers and assets
+            requestBody:
+              description: Request body for create a new Organization
+
+resources:
+  Resources:
+    onlyBody:
+      Type: 'AWS::ApiGateway::RequestValidator'
+      Properties:
+        Name: 'only-body'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: true
+
+    consentManagementTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.dynamo-consent-management}
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+          - AttributeName: data_key
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: PK-data_key-Filter
+            KeySchema:
+              - AttributeName: PK
+                KeyType: HASH
+              - AttributeName: data_key
+                KeyType: S
+            Projection:
+              ProjectionType: ALL
+          - IndexName: data_key-filter
+            KeySchema:
+              - AttributeName: data_key
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+
+    # # SQS Queue to Update DynamoDB
+    # ConsentQueueExample:
+    #   Type: AWS::SQS::Queue
+    #   Properties:
+    #     QueueName: ${self:custom.sqs-logs}
+    #     MessageRetentionPeriod: 1209600
+    #     VisibilityTimeout: 60

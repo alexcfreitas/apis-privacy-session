@@ -1,0 +1,110 @@
+{
+    "resource": "/createWithList",
+    "path": "/createWithList",
+    "httpMethod": "POST",
+    "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Cache-Control": "no-cache",
+        "Content-Type": "application/json",
+        "Host": "nbzldtje0d.execute-api.sa-east-1.amazonaws.com",
+        "Postman-Token": "3de37d44-4173-4bc5-bac6-29a325ec47d8",
+        "User-Agent": "PostmanRuntime/7.26.5",
+        "X-Amzn-Trace-Id": "Root=1-5f6b5b7a-3d09b010a82e833844533484",
+        "x-api-key": "QR3WX4MVZ2MH77KFXPM448717ETX",
+        "X-Forwarded-For": "186.228.167.31",
+        "X-Forwarded-Port": "443",
+        "X-Forwarded-Proto": "https"
+    },
+    "multiValueHeaders": {
+        "Accept": [
+            "*/*"
+        ],
+        "Accept-Encoding": [
+            "gzip, deflate, br"
+        ],
+        "Cache-Control": [
+            "no-cache"
+        ],
+        "Content-Type": [
+            "application/json"
+        ],
+        "Host": [
+            "nbzldtje0d.execute-api.sa-east-1.amazonaws.com"
+        ],
+        "Postman-Token": [
+            "3de37d44-4173-4bc5-bac6-29a325ec47d8"
+        ],
+        "User-Agent": [
+            "PostmanRuntime/7.26.5"
+        ],
+        "X-Amzn-Trace-Id": [
+            "Root=1-5f6b5b7a-3d09b010a82e833844533484"
+        ],
+        "x-api-key": [
+            "QR3WX4MVZ2MH77KFXPM448717ETX"
+        ],
+        "X-Forwarded-For": [
+            "186.228.167.31"
+        ],
+        "X-Forwarded-Port": [
+            "443"
+        ],
+        "X-Forwarded-Proto": [
+            "https"
+        ]
+    },
+    "queryStringParameters": null,
+    "multiValueQueryStringParameters": null,
+    "pathParameters": null,
+    "stageVariables": null,
+    "requestContext": {
+        "resourceId": "wnrk2e",
+        "resourcePath": "/createWithList",
+        "httpMethod": "POST",
+        "extendedRequestId": "TUs7MHExmjQFn_g=",
+        "requestTime": "23/Sep/2020:14:28:10 +0000",
+        "path": "/dev/createWithList",
+        "accountId": "772000878796",
+        "protocol": "HTTP/1.1",
+        "stage": "dev",
+        "domainPrefix": "nbzldtje0d",
+        "requestTimeEpoch": 1600871290711,
+        "requestId": "4d62f766-66dd-45e5-9037-24b60cc2a337",
+        "identity": {
+            "cognitoIdentityPoolId": null,
+            "cognitoIdentityId": null,
+            "apiKey": "QR3WX4MVZ2MH77KFXPM448717ETX",
+            "principalOrgId": null,
+            "cognitoAuthenticationType": null,
+            "userArn": null,
+            "userAgent": "PostmanRuntime/7.26.5",
+            "accountId": null,
+            "caller": null,
+            "sourceIp": "186.228.167.31",
+            "accessKey": null,
+            "cognitoAuthenticationProvider": null,
+            "user": null
+        },
+        "authorizer": {
+            "asset": {
+                "org_id": "bde494dab5fb4af5937d1422b506d254"
+            }
+        },
+        "domainName": "nbzldtje0d.execute-api.sa-east-1.amazonaws.com",
+        "apiId": "nbzldtje0d"
+    },
+    "body": {
+        "spvll": "testea-alexkkkk-testetito",
+        "identifier":{
+           "key":"cbenef",
+           "value":"unimed-401010200355487-cbenef"
+        },
+        "consent": {
+           "is_accept": true,
+           "data": {"field1":{"sub_field1":"sub_field1", "sub_field2":"sub_field2", "sub_field3":{"sub_sub_field3":"sub_sub_field3"}}, "field2":"", "field3":"", "sub_field4":{"sub_sub_field4":"sub_sub_field4"}}
+        }
+      },
+    "isBase64Encoded": false
+}
+

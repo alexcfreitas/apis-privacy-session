@@ -1,0 +1,52 @@
+{
+	"name": "organization-consent-management",
+	"version": "1.0.0",
+	"description": "API of session token information",
+	"scripts": {
+		"deploy:dev": "./deploy.sh dev",
+		"docker": "docker-compose up --force-recreate",
+		"dev": "npm install; serverless offline start --stage local",
+		"unit-test": "mocha --recursive test/unit/",
+		"integration-test": "mocha --recursive test/integration/",
+		"create_domain:dev": " SLS_DEBUG=* sls create_domain --stage dev",
+		"create_domain:sandbox": "AWS_PROFILE=privally SLS_DEBUG=* sls create_domain --stage sandbox",
+		"create-session-unit-test": "node ./test/session/create.js",
+		"create-consent-unit-test": "node ./test/consent/create.js",
+		"create-person-unit-test": "node ./test/person/create.js",
+		"create-identifier-unit-test": "node ./test/identifier/create.js",
+		"create-asset-unit-test": "node ./test/asset/create.js",
+		"create-organization-unit-test": "node ./test/organization/create.js",
+		"createWithList-organization-unit-test": "node ./test/organization/createWithList.js",
+		"create-person-identifier-unit-test": "node ./test/person-identifier/create.js",
+		"create-person-session-unit-test": "node ./test/person-session/create.js",
+		"create-person-consent-unit-test": "node ./test/person-consent/create.js",
+		"list-asset-organization-unit-test": "node ./test/organization/listAssetById.js",
+		"list-identifier-organization-unit-test": "node ./test/organization/listIdentifierById.js",
+		"list-person-organization-unit-test": "node ./test/organization/listPersonsById.js",
+		"list-person-reference-organization-unit-test": "node ./test/person/listPersonReferencesByOrg.js"
+	},
+	"devDependencies": {
+		"aws-sdk": "^2.678.0",
+		"chai": "^4.2.0",
+		"eslint": "^6.8.0",
+		"eslint-config-standard": "^14.1.1",
+		"eslint-plugin-import": "^2.20.2",
+		"eslint-plugin-node": "^11.1.0",
+		"eslint-plugin-promise": "^4.2.1",
+		"eslint-plugin-standard": "^4.0.1",
+		"mocha": "^8.1.1",
+		"prettier": "^2.0.5",
+		"prettier-eslint": "^9.0.1",
+		"serverless-aws-documentation": "^1.1.0",
+		"serverless-domain-manager": "4.2.0",
+		"serverless-dynamodb-local": "0.2.38",
+		"serverless-offline": "6.7.0",
+		"serverless-offline-lambda": "^1.0.6",
+		"serverless-plugin-ifelse": "1.0.5"
+	},
+	"dependencies": {
+		"common": "file:../common",
+		"serverless-pseudo-parameters": "^1.6.0",
+		"serverless-reqvalidator-plugin": "1.0.3"
+	}
+}

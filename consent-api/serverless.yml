@@ -1,0 +1,176 @@
+service: consent-management
+provider:
+  name: aws
+  endpointType: REGIONAL
+  runtime: nodejs12.x
+  profile: privally
+  region: sa-east-1
+  timeout: 10
+  stage: ${opt:stage, 'prod'}
+  memorySize: 128
+  versionFunctions: false
+  package:
+    excludeDevDependencies: true
+    exclude:
+      - .git/**
+      - .vscode/**
+      - .test/**
+
+  environment: #Global Environment variables
+    ${file(../configs/${self:provider.stage}.yml)}
+
+  iamRoleStatements: # Permissions for all of your functions can be set here
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 'arn:aws:dynamodb:*:*:*'
+    - Effect: Allow
+      Action:
+        - sqs:*
+      Resource: 'arn:aws:sqs:*:*:*'
+
+custom:
+  region: ${self:provider.region}
+  stage: ${opt:stage, self:provider.stage}
+  prefix: ${self:service}-${self:custom.stage}
+  sqs-consent-management: sqs-consent-management-cache-${self:custom.stage}
+  lambda-consent-save: consent-management-cache-${self:custom.stage}-consentSave
+  dynamo-consent-management: table-consent-management-${self:custom.stage}
+  stageTargets:
+    dev:
+      domain: dev-sandbox.api.privally.ws
+      certificate: 'arn:aws:acm:sa-east-1:772000878796:certificate/0dfc4a90-633b-485c-a54c-41b16889b283'
+    sandbox:
+      domain: sandbox.api.privally.ws
+      certificate: 'arn:aws:acm:sa-east-1:772000878796:certificate/0dfc4a90-633b-485c-a54c-41b16889b283'
+    prod:
+      domain: api.privally.ws
+      certificate: 'arn:aws:acm:sa-east-1:772000878796:certificate/b3aacd15-7859-4022-9e6b-65c967eb9c03'
+  target: ${self:custom.stageTargets.${self:custom.stage}}
+  authorizer:
+    default:
+      name: authorizerAsset
+      type: token
+      identitySource: method.request.header.x-api-key
+      resultTtlInSeconds: 0
+  documentation:
+    api:
+      info:
+        version: v0.0.1
+        title: Privally Session Information
+        description: API for Get Information of Session
+    models:
+      - name: sessionStartRequest
+        contentType: application/json
+        schema:
+          type: 'object'
+          properties:
+            spvll:
+              type: 'string'
+            identifier:
+              type: 'object'
+              properties:
+                key:
+                  type: 'string'
+                value:
+                  type: 'string'
+  customDomain:
+    domainName: ${self:custom.target.domain}
+    stage: ${self:provider.stage}
+    basePath: consent
+    certificateArn: ${self:custom.target.certificate}
+    createRoute53Record: true
+    endpointType: 'regional'
+    securityPolicy: tls_1_2
+    apiType: rest
+    autoDomain: false
+
+plugins:
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
+  - serverless-domain-manager
+
+functions:
+  authorizerAsset:
+    handler: ./endpoints/authorizer.authorizer
+
+  getBySession:
+    handler: ./endpoints/getBySession.run
+    memorySize: 128
+    timeout: 30
+    events:
+      - http:
+          path: enable
+          method: post
+          cors: true
+          authorizer: ${self:custom.authorizer.default}
+          documentation:
+            summary: Find Consent by Session to Privally
+            description: This endpoint receive session for find consent
+            requestBody:
+              description: Request body for session
+
+  putBySession:
+    handler: ./endpoints/putBySession.run
+    memorySize: 128
+    timeout: 30
+    events:
+      - http:
+          path: enable
+          method: put
+          cors: true
+          authorizer: ${self:custom.authorizer.default}
+          documentation:
+            summary: Insert Consent by Session to Privally
+            description: This endpoint receive session for find consent
+            requestBody:
+              description: Request body for session
+
+  getRootBySession:
+    handler: ./endpoints/getBySession.run
+    memorySize: 128
+    timeout: 30
+    events:
+      - http:
+          path: /
+          method: post
+          cors: true
+          authorizer: ${self:custom.authorizer.default}
+          documentation:
+            summary: Find Consent by Session to Privally
+            description: This endpoint receive session for find consent
+            requestBody:
+              description: Request body for session
+
+  putRootBySession:
+    handler: ./endpoints/putBySession.run
+    memorySize: 128
+    timeout: 30
+    events:
+      - http:
+          path: /
+          method: put
+          cors: true
+          authorizer: ${self:custom.authorizer.default}
+          documentation:
+            summary: Insert Consent by Session to Privally
+            description: This endpoint receive session for find consent
+            requestBody:
+              description: Request body for session
+
+resources:
+  Resources:
+    onlyBody:
+      Type: 'AWS::ApiGateway::RequestValidator'
+      Properties:
+        Name: 'only-body'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: true
