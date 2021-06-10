@@ -1,0 +1,17 @@
+{
+	"name": "consent-management-cache",
+	"version": "1.0.0",
+	"description": "API of session token information",
+	"scripts": {
+		"deploy:dev": "SLS_DEBUG=* sls deploy --stage dev",
+		"deploy": "SLS_DEBUG=* sls deploy --stage prod --region sa-east-1",
+		"test": "IS_OFFLINE=true node ./test/exec.js"
+	},
+	"devDependencies": {
+		"aws-sdk": "^2.678.0"
+	},
+	"dependencies": {
+		"bluebird": "^3.7.2",
+		"redis": "^3.0.2"
+	}
+}
