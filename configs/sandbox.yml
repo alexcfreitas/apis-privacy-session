@@ -1,8 +1,0 @@
-ENV: sandbox
-MESSAGE: 'sandbox Env'
-DYNAMO_TABLE: ${self:custom.dynamo-consent-management} # Reference to Custom Env
-REDIS_LAMBDA: ${self:custom.lambda-consent-save}
-REGION: sa-east-1
-SQS_QUEUE_URL: 'https://sqs.${self:provider.region}.amazonaws.com/772000878796/${self:custom.sqs-consent-management}'
-REDIS_HOST: platform-prd-01.vk1iyo.ng.0001.sae1.cache.amazonaws.com
-REDIS_PORT: 6310
