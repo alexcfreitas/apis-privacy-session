@@ -39,15 +39,18 @@ custom:
   lambda-consent-save: consent-management-cache-${self:custom.stage}-consentSave
   sqs-consent-management: sqs-consent-management-${self:custom.stage}
   stageTargets:
+    local:
+      domain: dev-sandbox.api.privally.ws
+      certificate: 'arn:aws:acm:sa-east-1:{{ACCOUNT}}:certificate/{{UUID}}'
     dev:
       domain: dev-sandbox.api.privally.ws
-      certificate: 'arn:aws:acm:sa-east-1:772000878796:certificate/0dfc4a90-633b-485c-a54c-41b16889b283'
+      certificate: 'arn:aws:acm:sa-east-1:{{ACCOUNT}}:certificate/{{UUID}}'
     sandbox:
       domain: sandbox.api.privally.ws
-      certificate: 'arn:aws:acm:sa-east-1:772000878796:certificate/0dfc4a90-633b-485c-a54c-41b16889b283'
+      certificate: 'arn:aws:acm:sa-east-1:{{ACCOUNT}}:certificate/{{UUID}}'
     prod:
       domain: api.privally.ws
-      certificate: 'arn:aws:acm:sa-east-1:772000878796:certificate/b3aacd15-7859-4022-9e6b-65c967eb9c03'
+      certificate: 'arn:aws:acm:sa-east-1:{{ACCOUNT}}:certificate/{{UUID}}'
   target: ${self:custom.stageTargets.${self:custom.stage}}
   authorizer:
     default:
